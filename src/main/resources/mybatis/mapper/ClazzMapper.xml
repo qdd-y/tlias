@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.qdd.tlias.mapper.ClazzMapper">
+
+    <select id="list" resultType="cn.qdd.tlias.pojo.Clazz">
+        select c.*,
+               e.name as master_name,
+               case
+                   when curdate() &lt; c.begin_date then '未开班'
+                   when curdate() &gt; c.end_date then '已结课'
+                   else '在读'
+               end as status
+        from clazz c
+                 left join emp e on c.master_id = e.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like concat('%', #{name}, '%')
+            </if>
+            <if test="room != null and room != ''">
+                and c.room like concat('%', #{room}, '%')
+            </if>
+            <if test="masterId != null">
+                and c.master_id = #{masterId}
+            </if>
+            <if test="subject != null">
+                and c.subject = #{subject}
+            </if>
+        </where>
+        order by c.id desc
+    </select>
+
+    <select id="getById" resultType="cn.qdd.tlias.pojo.Clazz">
+        select c.*,
+               e.name as master_name,
+               case
+                   when curdate() &lt; c.begin_date then '未开班'
+                   when curdate() &gt; c.end_date then '已结课'
+                   else '在读'
+               end as status
+        from clazz c
+                 left join emp e on c.master_id = e.id
+        where c.id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into clazz(name, room, begin_date, end_date, master_id, subject, create_time, update_time)
+        values (#{name}, #{room}, #{beginDate}, #{endDate}, #{masterId}, #{subject}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateById">
+        update clazz
+        set name = #{name},
+            room = #{room},
+            begin_date = #{beginDate},
+            end_date = #{endDate},
+            master_id = #{masterId},
+            subject = #{subject},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from clazz where id = #{id}
+    </delete>
+</mapper>

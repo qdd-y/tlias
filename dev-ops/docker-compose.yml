@@ -1,0 +1,35 @@
+services:
+  bigeventqd:
+    image: qdd/tliasqd:latest   # 或 build: { context: ./qd }
+    container_name: tliasqd
+    volumes:
+      - ./qd/dist:/usr/share/nginx/html:ro
+#      - ./qd/nginx.conf:/etc/nginx/conf.d/default.conf:ro  # 如未内置配置
+    ports:
+      - "18080:80"
+    networks:
+      - software_my-network
+    restart: unless-stopped
+
+  bigeventhd:
+    image: qdd/tliashd:latest
+    container_name: tliashd
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tlias?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+      ALIOSS_ENDPOINT:
+      ALIOSS_ACCESS_KEY_ID:
+      ALIOSS_ACCESS_KEY_SECRET:
+      ALIOSS_BUCKET_NAME:
+    ports:
+      - "18081:8080"
+    networks:
+      - software_my-network
+    restart: unless-stopped
+
+networks:
+  software_my-network:
+    external: true
+
+
